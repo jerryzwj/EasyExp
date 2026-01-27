@@ -19,7 +19,16 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const payType = searchParams.get('payType');
 
     // 构建查询条件
-    const query: any = { userId };
+    interface ExportQuery {
+      userId: string;
+      date?: {
+        $gte?: Date;
+        $lte?: Date;
+      };
+      reimburseType?: string;
+      payType?: string;
+    }
+    const query: ExportQuery = { userId };
     
     if (startDate) {
       query.date = { ...query.date, $gte: new Date(startDate) };

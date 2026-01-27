@@ -16,7 +16,15 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const endDate = searchParams.get('endDate');
 
     // 构建查询条件
-    const query: any = { userId };
+    interface StatsQuery {
+      userId: string;
+      date?: {
+        $gte?: Date;
+        $lte?: Date;
+      };
+      reimburseType?: string;
+    }
+    const query: StatsQuery = { userId };
     
     if (startDate) {
       query.date = { ...query.date, $gte: new Date(startDate) };
