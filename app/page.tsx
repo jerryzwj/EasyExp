@@ -537,12 +537,12 @@ export default function HomePage() {
                             ¥{expense.amount.toFixed(2)}
                           </h3>
                           <div className="flex items-center space-x-2 text-sm">
-                            <span className="text-gray-500">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
+                            <span className="text-gray-500 min-w-[100px] inline-block">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
                             <span className="text-gray-400">·</span>
                             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                               expense.reimburseType === '待报销' ? 'bg-blue-100 text-blue-800' :
                               expense.reimburseType === '报销中' ? 'bg-green-100 text-green-800' :
-                              expense.reimburseType === '已报销' ? 'bg-purple-100 text-purple-800' :
+                              expense.reimburseType === '已报销' ? 'bg-green-100 text-green-800' :
                               expense.reimburseType === '无需报销' ? 'bg-gray-100 text-gray-800' :
                               'bg-yellow-100 text-yellow-800'
                             }`}>
