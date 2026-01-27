@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
 
@@ -59,7 +59,7 @@ export default function HomePage() {
   const { user, logout, token } = useAuth();
 
   // 获取配置信息
-  const fetchConfig = useCallback(async () => {
+  const fetchConfig = async () => {
     if (!token) return;
 
     try {
@@ -79,13 +79,14 @@ export default function HomePage() {
     } catch (error) {
       console.error('获取配置失败:', error);
     }
-  }, [token]);
+  };
 
   // 获取统计数据
-  const fetchStats = useCallback(async () => {
+  const fetchStats = async () => {
     if (!token) return;
 
     try {
+      // 构建查询参数
       const params = new URLSearchParams();
       if (filters.startDate) params.append('startDate', filters.startDate);
       if (filters.endDate) params.append('endDate', filters.endDate);
@@ -108,13 +109,14 @@ export default function HomePage() {
     } catch (error) {
       console.error('获取统计数据失败:', error);
     }
-  }, [token, filters]);
+  };
 
   // 获取支出列表
-  const fetchExpenses = useCallback(async (page: number = 1) => {
+  const fetchExpenses = async (page: number = 1) => {
     if (!token) return;
 
     try {
+      // 构建查询参数
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', pagination.limit.toString());
@@ -144,7 +146,7 @@ export default function HomePage() {
     } catch (error) {
       console.error('获取支出列表失败:', error);
     }
-  }, [token, pagination.limit, filters]);
+  };
 
   // 如果用户未登录，重定向到登录页
   useEffect(() => {
@@ -158,7 +160,7 @@ export default function HomePage() {
         fetchExpenses(1); // 重置到第一页
       }, 0);
     }
-  }, [user, router, token, fetchConfig, fetchStats, fetchExpenses]);
+  }, [user, router, token]);
 
   // 当筛选条件变化时，重新获取数据
   useEffect(() => {
@@ -169,7 +171,7 @@ export default function HomePage() {
         fetchExpenses(1); // 重置到第一页
       }, 0);
     }
-  }, [filters, user, token, fetchStats, fetchExpenses]);
+  }, [filters, user, token]);
 
   // 处理日期范围选择
   const handleDateRangeChange = (value: string) => {
@@ -369,7 +371,7 @@ export default function HomePage() {
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
             <div className="flex items-center">
-              <div className="shrink-0">
+              <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -537,12 +539,12 @@ export default function HomePage() {
                             ¥{expense.amount.toFixed(2)}
                           </h3>
                           <div className="flex items-center space-x-2 text-sm">
-                            <span className="text-gray-500 min-w-[100px] inline-block">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
+                            <span className="text-gray-500">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
                             <span className="text-gray-400">·</span>
                             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                               expense.reimburseType === '待报销' ? 'bg-blue-100 text-blue-800' :
                               expense.reimburseType === '报销中' ? 'bg-green-100 text-green-800' :
-                              expense.reimburseType === '已报销' ? 'bg-green-100 text-green-800' :
+                              expense.reimburseType === '已报销' ? 'bg-purple-100 text-purple-800' :
                               expense.reimburseType === '无需报销' ? 'bg-gray-100 text-gray-800' :
                               'bg-yellow-100 text-yellow-800'
                             }`}>
@@ -589,7 +591,7 @@ export default function HomePage() {
           
           {/* 分页组件 */}
           {pagination.total > 0 && (
-            <div className="px-4 py-3 sm:px-6 flex items-center justify-between border-t border-gray-200">
+            <div className="px-4 py-3 sm:px-6 flex items-center justify-between border-t border-gray-200 sm:px-6">
               <div className="hidden sm:block">
                 <p className="text-sm text-gray-700">
                   显示第 <span className="font-medium">{(pagination.currentPage - 1) * pagination.limit + 1}</span> 到 <span className="font-medium">{Math.min(pagination.currentPage * pagination.limit, pagination.total)}</span> 条，共 <span className="font-medium">{pagination.total}</span> 条记录

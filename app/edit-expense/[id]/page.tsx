@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
 
@@ -31,8 +31,18 @@ export default function EditExpensePage() {
   const router = useRouter();
   const { user, token } = useAuth();
 
+  // 如果用户未登录，重定向到登录页
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    } else {
+      fetchExpense();
+      fetchConfig();
+    }
+  }, [user, router, id]);
+
   // 获取支出记录信息
-  const fetchExpense = useCallback(async () => {
+  const fetchExpense = async () => {
     if (!token || !id) return;
 
     try {
@@ -55,10 +65,10 @@ export default function EditExpensePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [token, id]);
+  };
 
   // 获取配置信息
-  const fetchConfig = useCallback(async () => {
+  const fetchConfig = async () => {
     if (!token) return;
 
     try {
@@ -78,17 +88,7 @@ export default function EditExpensePage() {
     } catch (error) {
       console.error('获取配置失败:', error);
     }
-  }, [token]);
-
-  // 如果用户未登录，重定向到登录页
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    } else {
-      fetchExpense();
-      fetchConfig();
-    }
-  }, [user, router, id, fetchExpense, fetchConfig]);
+  };
 
   // 处理输入变化
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
