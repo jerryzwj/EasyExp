@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx';
 import clientPromise from '@/lib/mongodb';
 import { withAuth } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const client = await clientPromise;
