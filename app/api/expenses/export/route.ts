@@ -73,7 +73,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
 
       // 创建响应
-      const response = new NextResponse(excelBuffer as Buffer);
+      const response = new NextResponse(excelBuffer.buffer);
       response.headers.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       response.headers.set('Content-Disposition', 'attachment; filename=expenses.xlsx');
 
