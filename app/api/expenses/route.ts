@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { withAuth } from '@/lib/auth';
 
-export const dynamic = 'force-dynamic';
-
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const client = await clientPromise;
@@ -20,23 +18,22 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const payType = searchParams.get('payType');
 
     // 构建查询条件
-    interface ExpenseQuery {
-      userId: string;
-      date?: {
-        $gte?: Date;
-        $lte?: Date;
-      };
-      reimburseType?: string;
-      payType?: string;
-    }
-    const query: ExpenseQuery = { userId };
+    const query: Record<string, unknown> = { userId };
     
     if (startDate) {
-      query.date = { ...query.date, $gte: new Date(startDate) };
+      if (query.date && typeof query.date === 'object') {
+        query.date = { ...query.date, $gte: new Date(startDate) };
+      } else {
+        query.date = { $gte: new Date(startDate) };
+      }
     }
     
     if (endDate) {
-      query.date = { ...query.date, $lte: new Date(endDate) };
+      if (query.date && typeof query.date === 'object') {
+        query.date = { ...query.date, $lte: new Date(endDate) };
+      } else {
+        query.date = { $lte: new Date(endDate) };
+      }
     }
     
     if (reimburseType) {

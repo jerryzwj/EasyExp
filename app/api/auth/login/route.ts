@@ -3,8 +3,6 @@ import bcrypt from 'bcrypt';
 import clientPromise from '@/lib/mongodb';
 import { generateToken } from '@/lib/jwt';
 
-export const dynamic = 'force-dynamic';
-
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json();

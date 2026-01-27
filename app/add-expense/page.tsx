@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
 
@@ -18,8 +18,17 @@ export default function AddExpensePage() {
   const router = useRouter();
   const { user, token } = useAuth();
 
+  // 如果用户未登录，重定向到登录页
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    } else {
+      fetchConfig();
+    }
+  }, [user, router]);
+
   // 获取配置信息
-  const fetchConfig = useCallback(async () => {
+  const fetchConfig = async () => {
     if (!token) return;
 
     try {
@@ -43,16 +52,7 @@ export default function AddExpensePage() {
     } catch (error) {
       console.error('获取配置失败:', error);
     }
-  }, [token]);
-
-  // 如果用户未登录，重定向到登录页
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    } else {
-      fetchConfig();
-    }
-  }, [user, router, fetchConfig]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

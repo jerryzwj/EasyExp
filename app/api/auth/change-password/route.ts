@@ -4,8 +4,6 @@ import clientPromise from '@/lib/mongodb';
 import { withAuth } from '@/lib/auth';
 import { ObjectId } from 'mongodb';
 
-export const dynamic = 'force-dynamic';
-
 export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const client = await clientPromise;

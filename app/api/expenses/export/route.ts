@@ -3,8 +3,6 @@ import * as XLSX from 'xlsx';
 import clientPromise from '@/lib/mongodb';
 import { withAuth } from '@/lib/auth';
 
-export const dynamic = 'force-dynamic';
-
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const client = await clientPromise;
@@ -19,23 +17,22 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const payType = searchParams.get('payType');
 
     // 构建查询条件
-    interface ExportQuery {
-      userId: string;
-      date?: {
-        $gte?: Date;
-        $lte?: Date;
-      };
-      reimburseType?: string;
-      payType?: string;
-    }
-    const query: ExportQuery = { userId };
+    const query: Record<string, unknown> = { userId };
     
     if (startDate) {
-      query.date = { ...query.date, $gte: new Date(startDate) };
+      if (query.date && typeof query.date === 'object') {
+        query.date = { ...query.date, $gte: new Date(startDate) };
+      } else {
+        query.date = { $gte: new Date(startDate) };
+      }
     }
     
     if (endDate) {
-      query.date = { ...query.date, $lte: new Date(endDate) };
+      if (query.date && typeof query.date === 'object') {
+        query.date = { ...query.date, $lte: new Date(endDate) };
+      } else {
+        query.date = { $lte: new Date(endDate) };
+      }
     }
     
     if (reimburseType) {
@@ -81,10 +78,10 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
 
     // 生成 Excel 文件
     try {
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 
       // 创建响应
-      const response = new NextResponse(excelBuffer.buffer);
+      const response = new NextResponse(Buffer.from(excelBuffer));
       response.headers.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       response.headers.set('Content-Disposition', 'attachment; filename=expenses.xlsx');
 
