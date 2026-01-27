@@ -342,21 +342,21 @@ export default function HomePage() {
       {/* 导航栏 */}
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">EasyExp 简易账本</h1>
+              <h1 className="text-xl font-bold text-gray-900 sm:text-lg">EasyExp 简易账本</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">欢迎，{user?.username}</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <span className="text-xs sm:text-sm text-gray-600 hidden sm:block">欢迎，{user?.username}</span>
               <button
                 onClick={handleSettings}
-                className="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                className="px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200"
               >
                 设置
               </button>
               <button
                 onClick={handleLogout}
-                className="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                className="px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200"
               >
                 登出
               </button>
@@ -366,7 +366,7 @@ export default function HomePage() {
       </nav>
 
       {/* 主内容区 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* 错误信息 */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
@@ -394,131 +394,135 @@ export default function HomePage() {
         )}
 
         {/* 筛选条件 */}
-        <div className="bg-white p-6 rounded-lg shadow mb-8">
+        <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 mb-8">
           <h3 className="text-lg font-medium text-gray-900 mb-4">筛选条件</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* 日期范围 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">日期范围</label>
-              <select
-                value={filters.dateRange}
-                onChange={(e) => handleDateRangeChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="全部">全部</option>
-                <option value="本年度">本年度</option>
-                <option value="本周">本周</option>
-                <option value="本月">本月</option>
-                <option value="上月">上月</option>
-                <option value="自定义">自定义</option>
-              </select>
-            </div>
-
-            {/* 开始日期 */}
-            {filters.dateRange === '自定义' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
-                <input
-                  type="date"
-                  value={filters.startDate}
-                  onChange={(e) => handleStartDateChange(e.target.value)}
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* 日期范围 */}
+              <div className="lg:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">日期范围</label>
+                <select
+                  value={filters.dateRange}
+                  onChange={(e) => handleDateRangeChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+                >
+                  <option value="全部">全部</option>
+                  <option value="本年度">本年度</option>
+                  <option value="本周">本周</option>
+                  <option value="本月">本月</option>
+                  <option value="上月">上月</option>
+                  <option value="自定义">自定义</option>
+                </select>
               </div>
-            )}
 
-            {/* 结束日期 */}
-            {filters.dateRange === '自定义' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
-                <input
-                  type="date"
-                  value={filters.endDate}
-                  onChange={(e) => handleEndDateChange(e.target.value)}
+              {/* 开始日期 */}
+              {filters.dateRange === '自定义' && (
+                <div className="lg:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+                  <input
+                    type="date"
+                    value={filters.startDate}
+                    onChange={(e) => handleStartDateChange(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              )}
+
+              {/* 结束日期 */}
+              {filters.dateRange === '自定义' && (
+                <div className="lg:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
+                  <input
+                    type="date"
+                    value={filters.endDate}
+                    onChange={(e) => handleEndDateChange(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              )}
+
+              {/* 报销类型 */}
+              <div className={`${filters.dateRange === '自定义' ? 'sm:col-span-1' : 'lg:col-span-1'}`}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">报销类型</label>
+                <select
+                  value={filters.reimburseType}
+                  onChange={(e) => handleReimburseTypeChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+                >
+                  <option value="全部">全部</option>
+                  {config.reimburseTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
 
-            {/* 报销类型 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">报销类型</label>
-              <select
-                value={filters.reimburseType}
-                onChange={(e) => handleReimburseTypeChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="全部">全部</option>
-                {config.reimburseTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* 支付类型 */}
+              <div className={`${filters.dateRange === '自定义' ? 'sm:col-span-1' : 'lg:col-span-1'}`}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">支付类型</label>
+                <select
+                  value={filters.payType}
+                  onChange={(e) => handlePayTypeChange(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="全部">全部</option>
+                  {config.payTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* 支付类型 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">支付类型</label>
-              <select
-                value={filters.payType}
-                onChange={(e) => handlePayTypeChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="全部">全部</option>
-                {config.payTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
+              {/* 重置按钮 */}
+              <div className={`${filters.dateRange === '自定义' ? 'sm:col-span-2 lg:col-span-1' : 'lg:col-span-1'} flex items-end justify-end`}>
+                <button
+                  onClick={resetFilters}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                >
+                  重置筛选
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="mt-4 flex justify-end">
-            <button
-              onClick={resetFilters}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              重置筛选
-            </button>
           </div>
         </div>
 
         {/* 统计卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
             <h3 className="text-sm font-medium text-gray-500">支出总额</h3>
             <p className="mt-1 text-2xl font-semibold text-gray-900">¥{stats.totalExpense.toFixed(2)}</p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">待报销金额</h3>
-            <p className="mt-1 text-2xl font-semibold text-gray-900">¥{stats.pendingReimburse.toFixed(2)}</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">已报销金额</h3>
-            <p className="mt-1 text-2xl font-semibold text-gray-900">¥{stats.reimbursed.toFixed(2)}</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
             <h3 className="text-sm font-medium text-gray-500">收支差额</h3>
             <p className={`mt-1 text-2xl font-semibold ${stats.balance < 0 ? 'text-red-600' : stats.balance > 0 ? 'text-green-600' : 'text-gray-900'}`}>
               ¥{stats.balance.toFixed(2)}
             </p>
           </div>
+          <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <h3 className="text-sm font-medium text-gray-500">待报销金额</h3>
+            <p className="mt-1 text-2xl font-semibold text-gray-900">¥{stats.pendingReimburse.toFixed(2)}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <h3 className="text-sm font-medium text-gray-500">已报销金额</h3>
+            <p className="mt-1 text-2xl font-semibold text-gray-900">¥{stats.reimbursed.toFixed(2)}</p>
+          </div>
         </div>
 
         {/* 操作按钮 */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-900">最近支出</h2>
-          <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 sm:text-lg">最近支出</h2>
+          <div className="flex space-x-2 sm:space-x-4 w-full sm:w-auto">
             <button
               onClick={handleAddExpense}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm transition-colors duration-200"
             >
               新增支出
             </button>
             <button
               onClick={handleExport}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-sm transition-colors duration-200"
             >
               导出 Excel
             </button>
@@ -526,7 +530,7 @@ export default function HomePage() {
         </div>
 
         {/* 支出列表 */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+        <div className="bg-white shadow-lg overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-gray-200">
             {expenses.length > 0 ? (
               expenses.map((expense) => (
@@ -539,28 +543,27 @@ export default function HomePage() {
                             ¥{expense.amount.toFixed(2)}
                           </h3>
                           <div className="mt-1 text-right">
-                            <div className="text-xs text-green-600">
+                            <div className="text-xs sm:text-sm text-green-600">
                               {expense.reimburseAmount && `报销: ¥${expense.reimburseAmount.toFixed(2)}`}
                             </div>
                           </div>
                         </div>
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2 text-xs mb-1" style={{ fontSize: '10px' }}>
+                        <div className="flex items-center space-x-2 text-xs sm:text-sm mb-1">
                           <span className="text-gray-500">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
-                          <span className="text-gray-400">·</span>
                           <span className={`px-2 py-0.5 rounded-full font-medium ${
                             expense.reimburseType === '已报销' ? 'bg-green-100 text-green-800' :
+                            expense.reimburseType === '待报销' ? 'bg-yellow-100 text-yellow-800' :
                             'bg-blue-100 text-blue-800'
-                          }`} style={{ fontSize: '9px' }}>
+                          }`}>
                             {expense.reimburseType}
                           </span>
-                          <span className="text-gray-400">·</span>
                           <span className="text-gray-500">{expense.payType}</span>
                         </div>
                         <div className="mt-1">
                           {expense.other && (
-                            <p className="text-gray-500" style={{ fontSize: '10px' }}>备注: {expense.other}</p>
+                            <p className="text-xs sm:text-sm text-gray-500">备注: {expense.other}</p>
                           )}
                         </div>
                       </div>
