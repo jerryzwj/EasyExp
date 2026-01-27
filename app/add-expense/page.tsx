@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
 
@@ -16,27 +16,14 @@ export default function AddExpensePage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user, token } = useAuth();
-
-  // 如果用户未登录，重定向到登录页
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    } else {
-      fetchConfig();
-    }
-  }, [user, router]);
+  const { user, token, authenticatedFetch } = useAuth();
 
   // 获取配置信息
-  const fetchConfig = async () => {
+  const fetchConfig = useCallback(async () => {
     if (!token) return;
 
     try {
-      const response = await fetch('/api/config', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch('/api/config');
 
       if (response.ok) {
         const data = await response.json();
@@ -51,8 +38,18 @@ export default function AddExpensePage() {
       }
     } catch (error) {
       console.error('获取配置失败:', error);
+      setError(error instanceof Error ? error.message : '获取配置失败');
     }
-  };
+  }, [token, authenticatedFetch]);
+
+  // 如果用户未登录，重定向到登录页
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    } else {
+      fetchConfig();
+    }
+  }, [user, router, fetchConfig]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,11 +66,10 @@ export default function AddExpensePage() {
         other
       };
 
-      const response = await fetch('/api/expenses', {
+      const response = await authenticatedFetch('/api/expenses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(expenseData),
       });

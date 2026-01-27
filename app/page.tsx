@@ -56,18 +56,14 @@ export default function HomePage() {
     limit: 10
   });
   const router = useRouter();
-  const { user, logout, token } = useAuth();
+  const { user, logout, token, authenticatedFetch } = useAuth();
 
   // 获取配置信息
   const fetchConfig = useCallback(async () => {
     if (!token) return;
 
     try {
-      const response = await fetch('/api/config', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch('/api/config');
 
       if (response.ok) {
         const data = await response.json();
@@ -78,8 +74,10 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error('获取配置失败:', error);
+      // 这里可以添加错误提示
+      setError(error instanceof Error ? error.message : '获取配置失败');
     }
-  }, [token]);
+  }, [token, authenticatedFetch]);
 
   // 获取统计数据
   const fetchStats = useCallback(async () => {
@@ -96,11 +94,7 @@ export default function HomePage() {
       const queryString = params.toString();
       const url = `/api/expenses/stats${queryString ? `?${queryString}` : ''}`;
 
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch(url);
 
       if (response.ok) {
         const data = await response.json();
@@ -108,8 +102,10 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error('获取统计数据失败:', error);
+      // 这里可以添加错误提示
+      setError(error instanceof Error ? error.message : '获取统计数据失败');
     }
-  }, [token, filters]);
+  }, [token, filters, authenticatedFetch]);
 
   // 获取支出列表
   const fetchExpenses = useCallback(async (page: number = 1) => {
@@ -128,11 +124,7 @@ export default function HomePage() {
       const queryString = params.toString();
       const url = `/api/expenses?${queryString}`;
 
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch(url);
 
       if (response.ok) {
         const data = await response.json();
@@ -145,8 +137,10 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error('获取支出列表失败:', error);
+      // 这里可以添加错误提示
+      setError(error instanceof Error ? error.message : '获取支出列表失败');
     }
-  }, [token, filters, pagination.limit]);
+  }, [token, filters, pagination.limit, authenticatedFetch]);
 
   // 如果用户未登录，重定向到登录页
   useEffect(() => {
@@ -299,11 +293,7 @@ export default function HomePage() {
       const url = `/api/expenses/export${queryString ? `?${queryString}` : ''}`;
 
       // 发送请求
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch(url);
 
       if (response.ok) {
         // 获取文件名
@@ -328,7 +318,7 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error('导出失败:', error);
-      setError('导出失败');
+      setError(error instanceof Error ? error.message : '导出失败');
     }
   };
 

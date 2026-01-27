@@ -16,7 +16,7 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user, token, authenticatedFetch } = useAuth();
 
   // 如果用户未登录，重定向到登录页
   useEffect(() => {
@@ -32,11 +32,7 @@ export default function SettingsPage() {
     if (!token) return;
 
     try {
-      const response = await fetch('/api/config', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch('/api/config');
 
       if (response.ok) {
         const data = await response.json();
@@ -49,6 +45,7 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('获取配置失败:', error);
+      setError(error instanceof Error ? error.message : '获取配置失败');
     }
   };
 
@@ -57,11 +54,10 @@ export default function SettingsPage() {
     if (!token) return;
 
     try {
-      const response = await fetch('/api/config', {
+      const response = await authenticatedFetch('/api/config', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ type, options }),
       });
@@ -178,11 +174,10 @@ export default function SettingsPage() {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/auth/change-password', {
+      const response = await authenticatedFetch('/api/auth/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ currentPassword, newPassword }),
       });

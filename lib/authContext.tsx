@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, password: string, email?: string) => Promise<void>;
   logout: () => void;
+  authenticatedFetch: (url: string, options?: RequestInit) => Promise<Response>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -97,8 +98,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setToken(null);
   };
 
+  // 通用的认证错误处理fetch函数
+  const authenticatedFetch = async (url: string, options: RequestInit = {}) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    // 处理401未授权错误
+    if (response.status === 401) {
+      logout();
+      throw new Error('登录已过期，请重新登录');
+    }
+
+    return response;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, authenticatedFetch }}>
       {children}
     </AuthContext.Provider>
   );

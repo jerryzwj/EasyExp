@@ -29,18 +29,14 @@ export default function EditExpensePage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user, token, authenticatedFetch } = useAuth();
 
   // 获取支出记录信息
   const fetchExpense = useCallback(async () => {
     if (!token || !id) return;
 
     try {
-      const response = await fetch(`/api/expenses/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch(`/api/expenses/${id}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -51,22 +47,18 @@ export default function EditExpensePage() {
       }
     } catch (error) {
       console.error('获取支出记录失败:', error);
-      setError('获取支出记录失败');
+      setError(error instanceof Error ? error.message : '获取支出记录失败');
     } finally {
       setIsLoading(false);
     }
-  }, [token, id]);
+  }, [token, id, authenticatedFetch]);
 
   // 获取配置信息
   const fetchConfig = useCallback(async () => {
     if (!token) return;
 
     try {
-      const response = await fetch('/api/config', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await authenticatedFetch('/api/config');
 
       if (response.ok) {
         const data = await response.json();
@@ -77,8 +69,9 @@ export default function EditExpensePage() {
       }
     } catch (error) {
       console.error('获取配置失败:', error);
+      setError(error instanceof Error ? error.message : '获取配置失败');
     }
-  }, [token]);
+  }, [token, authenticatedFetch]);
 
   // 如果用户未登录，重定向到登录页
   useEffect(() => {
@@ -113,11 +106,10 @@ export default function EditExpensePage() {
     setError('');
 
     try {
-      const response = await fetch(`/api/expenses/${id}`, {
+      const response = await authenticatedFetch(`/api/expenses/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(expense),
       });
@@ -148,11 +140,8 @@ export default function EditExpensePage() {
     setError('');
 
     try {
-      const response = await fetch(`/api/expenses/${id}`, {
+      const response = await authenticatedFetch(`/api/expenses/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       if (response.ok) {
