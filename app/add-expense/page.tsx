@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
 
 export default function AddExpensePage() {
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState('0');
   const [reimburseType, setReimburseType] = useState('待报销');
-  const [reimburseAmount, setReimburseAmount] = useState('');
+  const [reimburseAmount, setReimburseAmount] = useState('0');
   const [payType, setPayType] = useState('微信');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [other, setOther] = useState('');

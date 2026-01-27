@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
 
@@ -31,18 +31,8 @@ export default function EditExpensePage() {
   const router = useRouter();
   const { user, token } = useAuth();
 
-  // 如果用户未登录，重定向到登录页
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    } else {
-      fetchExpense();
-      fetchConfig();
-    }
-  }, [user, router, id]);
-
   // 获取支出记录信息
-  const fetchExpense = async () => {
+  const fetchExpense = useCallback(async () => {
     if (!token || !id) return;
 
     try {
@@ -65,10 +55,10 @@ export default function EditExpensePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token, id]);
 
   // 获取配置信息
-  const fetchConfig = async () => {
+  const fetchConfig = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -88,7 +78,17 @@ export default function EditExpensePage() {
     } catch (error) {
       console.error('获取配置失败:', error);
     }
-  };
+  }, [token]);
+
+  // 如果用户未登录，重定向到登录页
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    } else {
+      fetchExpense();
+      fetchConfig();
+    }
+  }, [user, router, id, fetchExpense, fetchConfig]);
 
   // 处理输入变化
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -131,6 +131,39 @@ export default function EditExpensePage() {
     } catch (error) {
       console.error('保存失败:', error);
       setError('保存失败');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 处理删除
+  const handleDelete = async () => {
+    if (!token || !expense) return;
+
+    if (!confirm('确定要删除这条支出记录吗？')) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/expenses/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        router.push('/');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || '删除失败');
+      }
+    } catch (error) {
+      console.error('删除失败:', error);
+      setError('删除失败');
     } finally {
       setIsLoading(false);
     }
@@ -254,7 +287,7 @@ export default function EditExpensePage() {
                       name="reimburseAmount"
                       step="0.01"
                       min="0"
-                      value={expense.reimburseAmount || ''}
+                      value={expense.reimburseAmount || 0}
                       onChange={handleChange}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -323,6 +356,14 @@ export default function EditExpensePage() {
             </div>
 
             <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isLoading}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+              >
+                删除
+              </button>
               <button
                 type="button"
                 onClick={() => router.push('/')}

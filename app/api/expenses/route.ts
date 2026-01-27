@@ -70,18 +70,13 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     const { amount, reimburseType, reimburseAmount, payType, date, other } = await request.json();
 
     // 验证必填字段
-    if (!amount || !reimburseType || !payType || !date) {
+    if (amount === undefined || !reimburseType || !payType || !date) {
       return NextResponse.json({ error: '金额、报销类型、支付类型和日期不能为空' }, { status: 400 });
     }
 
-    // 验证金额为正数
-    if (amount <= 0) {
-      return NextResponse.json({ error: '金额必须为正数' }, { status: 400 });
-    }
-
     // 验证报销金额
-    if (reimburseType === '已报销' && (!reimburseAmount || reimburseAmount <= 0)) {
-      return NextResponse.json({ error: '已报销类型必须填写报销金额且为正数' }, { status: 400 });
+    if (reimburseType === '已报销' && reimburseAmount === undefined) {
+      return NextResponse.json({ error: '已报销类型必须填写报销金额' }, { status: 400 });
     }
 
     const client = await clientPromise;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/authContext';
 
@@ -59,7 +59,7 @@ export default function HomePage() {
   const { user, logout, token } = useAuth();
 
   // 获取配置信息
-  const fetchConfig = async () => {
+  const fetchConfig = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -79,10 +79,10 @@ export default function HomePage() {
     } catch (error) {
       console.error('获取配置失败:', error);
     }
-  };
+  }, [token]);
 
   // 获取统计数据
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     if (!token) return;
 
     try {
@@ -109,10 +109,10 @@ export default function HomePage() {
     } catch (error) {
       console.error('获取统计数据失败:', error);
     }
-  };
+  }, [token, filters]);
 
   // 获取支出列表
-  const fetchExpenses = async (page: number = 1) => {
+  const fetchExpenses = useCallback(async (page: number = 1) => {
     if (!token) return;
 
     try {
@@ -146,7 +146,7 @@ export default function HomePage() {
     } catch (error) {
       console.error('获取支出列表失败:', error);
     }
-  };
+  }, [token, filters, pagination.limit]);
 
   // 如果用户未登录，重定向到登录页
   useEffect(() => {
@@ -160,7 +160,7 @@ export default function HomePage() {
         fetchExpenses(1); // 重置到第一页
       }, 0);
     }
-  }, [user, router, token]);
+  }, [user, router, token, fetchConfig, fetchStats, fetchExpenses]);
 
   // 当筛选条件变化时，重新获取数据
   useEffect(() => {
@@ -171,7 +171,7 @@ export default function HomePage() {
         fetchExpenses(1); // 重置到第一页
       }, 0);
     }
-  }, [filters, user, token]);
+  }, [filters, user, token, fetchExpenses, fetchStats]);
 
   // 处理日期范围选择
   const handleDateRangeChange = (value: string) => {
@@ -532,50 +532,49 @@ export default function HomePage() {
               expenses.map((expense) => (
                 <li key={expense._id}>
                   <div className="px-4 py-4 sm:px-6">
-                    <div className="flex flex-col">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center space-x-4">
-                          <h3 className="text-xl font-bold text-gray-900">
+                    <div className="flex">
+                      <div className="min-w-[120px] mr-4">
+                        <div className="text-right">
+                          <h3 className="text-xl font-bold text-gray-900 bg-red-100 px-2 py-1 rounded">
                             ¥{expense.amount.toFixed(2)}
                           </h3>
-                          <div className="flex items-center space-x-2 text-sm">
-                            <span className="text-gray-500">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
-                            <span className="text-gray-400">·</span>
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                              expense.reimburseType === '待报销' ? 'bg-blue-100 text-blue-800' :
-                              expense.reimburseType === '报销中' ? 'bg-green-100 text-green-800' :
-                              expense.reimburseType === '已报销' ? 'bg-purple-100 text-purple-800' :
-                              expense.reimburseType === '无需报销' ? 'bg-gray-100 text-gray-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {expense.reimburseType}
-                            </span>
-                            <span className="text-gray-400">·</span>
-                            <span className="text-gray-500">{expense.payType}</span>
+                          <div className="mt-1 text-right">
+                            <div className="text-xs text-green-600">
+                              {expense.reimburseAmount && `报销: ¥${expense.reimburseAmount.toFixed(2)}`}
+                            </div>
                           </div>
                         </div>
-                        <div className="flex space-x-2">
-                          <button 
-                            onClick={() => router.push(`/edit-expense/${expense._id}`)}
-                            className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 bg-blue-50 border border-blue-200 rounded-md"
-                          >
-                            编辑
-                          </button>
-                          <button className="p-1 text-red-600 hover:text-red-800 bg-red-50 border border-red-200 rounded-md" title="删除">
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 text-xs mb-1" style={{ fontSize: '10px' }}>
+                          <span className="text-gray-500">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
+                          <span className="text-gray-400">·</span>
+                          <span className={`px-2 py-0.5 rounded-full font-medium ${
+                            expense.reimburseType === '已报销' ? 'bg-green-100 text-green-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`} style={{ fontSize: '9px' }}>
+                            {expense.reimburseType}
+                          </span>
+                          <span className="text-gray-400">·</span>
+                          <span className="text-gray-500">{expense.payType}</span>
+                        </div>
+                        <div className="mt-1">
+                          {expense.other && (
+                            <p className="text-gray-500" style={{ fontSize: '10px' }}>备注: {expense.other}</p>
+                          )}
                         </div>
                       </div>
-                      {expense.reimburseAmount && (
-                        <div className="text-xs text-green-600">
-                          报销金额: ¥{expense.reimburseAmount.toFixed(2)}
-                        </div>
-                      )}
-                      {expense.other && (
-                        <p className="mt-1 text-sm text-gray-500">备注: {expense.other}</p>
-                      )}
+                      <div className="flex space-x-2 items-start">
+                        <button 
+                          onClick={() => router.push(`/edit-expense/${expense._id}`)}
+                          className="p-1 text-blue-600 hover:text-blue-800 bg-blue-50 border border-blue-200 rounded-md w-6 h-6 flex items-center justify-center"
+                          title="编辑"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -591,7 +590,7 @@ export default function HomePage() {
           
           {/* 分页组件 */}
           {pagination.total > 0 && (
-            <div className="px-4 py-3 sm:px-6 flex items-center justify-between border-t border-gray-200">
+            <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
               <div className="hidden sm:block">
                 <p className="text-sm text-gray-700">
                   显示第 <span className="font-medium">{(pagination.currentPage - 1) * pagination.limit + 1}</span> 到 <span className="font-medium">{Math.min(pagination.currentPage * pagination.limit, pagination.total)}</span> 条，共 <span className="font-medium">{pagination.total}</span> 条记录
