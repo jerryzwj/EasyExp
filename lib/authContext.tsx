@@ -36,14 +36,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
 
-    // 使用 setTimeout 避免同步调用 setState 导致级联渲染
-    setTimeout(() => {
-      if (storedUser && storedToken) {
-        setUser(JSON.parse(storedUser));
-        setToken(storedToken);
-      }
-      setIsLoading(false);
-    }, 0);
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setToken(storedToken);
+    }
+    setIsLoading(false);
   }, []);
 
   const login = async (username: string, password: string) => {

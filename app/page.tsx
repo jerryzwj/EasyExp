@@ -147,23 +147,25 @@ export default function HomePage() {
     if (!user) {
       router.push('/login');
     } else {
-      // 使用 setTimeout 避免同步调用 setState 导致级联渲染
-      setTimeout(() => {
-        fetchConfig();
-        fetchStats();
-        fetchExpenses(1); // 重置到第一页
-      }, 0);
+      // 使用异步函数包装，避免同步调用setState
+      const loadData = async () => {
+        await fetchConfig();
+        await fetchStats();
+        await fetchExpenses(1); // 重置到第一页
+      };
+      loadData();
     }
   }, [user, router, token, fetchConfig, fetchStats, fetchExpenses]);
 
   // 当筛选条件变化时，重新获取数据
   useEffect(() => {
     if (user && token) {
-      // 使用 setTimeout 避免同步调用 setState 导致级联渲染
-      setTimeout(() => {
-        fetchStats();
-        fetchExpenses(1); // 重置到第一页
-      }, 0);
+      // 使用异步函数包装，避免同步调用setState
+      const loadData = async () => {
+        await fetchStats();
+        await fetchExpenses(1); // 重置到第一页
+      };
+      loadData();
     }
   }, [filters, user, token, fetchExpenses, fetchStats]);
 
