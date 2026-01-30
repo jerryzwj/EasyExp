@@ -46,7 +46,12 @@ export const PUT = withAuth(async (request: NextRequest, userId: string) => {
       { upsert: true }
     );
 
-    return NextResponse.json({ message: '配置更新成功' }, { status: 200 });
+    // 获取更新后的所有配置
+    const updatedConfigs = await configCollection.find({ userId }).toArray();
+    const reimburseTypes = updatedConfigs.find(c => c.type === 'reimburseType')?.options || ['待报销', '报销中', '已报销'];
+    const payTypes = updatedConfigs.find(c => c.type === 'payType')?.options || ['微信', '支付宝', '现金', '网银'];
+
+    return NextResponse.json({ reimburseTypes, payTypes }, { status: 200 });
   } catch (error) {
     console.error('更新配置失败:', error);
     return NextResponse.json({ error: '更新配置失败' }, { status: 500 });

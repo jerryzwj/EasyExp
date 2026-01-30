@@ -336,7 +336,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900 sm:text-lg">EasyExp 简易账本</h1>
+              <h1 className="text-xl font-bold text-gray-900 sm:text-lg">简易账本</h1>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
               <span className="text-xs sm:text-sm text-gray-600 hidden sm:block">欢迎，{user?.username}</span>

@@ -5,8 +5,9 @@ const config: CapacitorConfig = {
   appName: 'MiniLedger',
   webDir: 'out',
   server: {
-    androidScheme: 'https',
-    hostname: 'zd.wenjun.eu.org'
+    androidScheme: 'http',
+    hostname: 'localhost',
+    allowNavigation: ['*']
   }
 };
 

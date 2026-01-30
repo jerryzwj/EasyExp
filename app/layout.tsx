@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EasyExp 简易账本",
+  title: "简易账本",
   description: "个人支出管理和报销追踪工具",
 };
 

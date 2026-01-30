@@ -210,6 +210,457 @@ MiniLedger/
 
 如果您有任何问题或建议，请随时联系我们。
 
+## 📖 API 调用方法
+
+### 基础信息
+
+#### API 基础 URL
+- 生产环境: `https://your-api-base-url.com`
+- 开发环境: `http://localhost:3000`
+
+#### 认证方式
+- 使用 JWT (JSON Web Token) 进行认证
+- 所有需要认证的 API 端点都需要在请求头中添加 `Authorization` 字段
+- 格式: `Authorization: Bearer <token>`
+
+### 认证相关 API
+
+#### 1. 登录
+- **端点**: `/api/auth/login`
+- **方法**: `POST`
+- **请求体**:
+  ```json
+  {
+    "username": "用户名",
+    "password": "密码"
+  }
+  ```
+- **响应**:
+  ```json
+  {
+    "token": "JWT 令牌",
+    "userId": "用户 ID",
+    "error": null
+  }
+  ```
+
+#### 2. 注册
+- **端点**: `/api/auth/register`
+- **方法**: `POST`
+- **请求体**:
+  ```json
+  {
+    "username": "用户名",
+    "password": "密码",
+    "email": "邮箱（可选）"
+  }
+  ```
+- **响应**:
+  ```json
+  {
+    "message": "注册成功",
+    "userId": "用户 ID",
+    "error": null
+  }
+  ```
+
+#### 3. 修改密码
+- **端点**: `/api/auth/change-password`
+- **方法**: `POST`
+- **请求头**: `Authorization: Bearer <token>`
+- **请求体**:
+  ```json
+  {
+    "currentPassword": "当前密码",
+    "newPassword": "新密码"
+  }
+  ```
+- **响应**:
+  ```json
+  {
+    "message": "密码修改成功",
+    "error": null
+  }
+  ```
+
+### 配置管理 API
+
+#### 1. 获取配置
+- **端点**: `/api/config`
+- **方法**: `GET`
+- **请求头**: `Authorization: Bearer <token>`
+- **响应**:
+  ```json
+  {
+    "reimburseTypes": ["待报销", "报销中", "已报销"],
+    "payTypes": ["微信", "支付宝", "现金", "网银"]
+  }
+  ```
+
+#### 2. 更新配置
+- **端点**: `/api/config`
+- **方法**: `PUT`
+- **请求头**: `Authorization: Bearer <token>`
+- **请求体**:
+  ```json
+  {
+    "type": "reimburseType", // 或 "payType"
+    "options": ["待报销", "报销中", "已报销", "新增类型"]
+  }
+  ```
+- **响应**:
+  ```json
+  {
+    "reimburseTypes": ["待报销", "报销中", "已报销", "新增类型"],
+    "payTypes": ["微信", "支付宝", "现金", "网银"]
+  }
+  ```
+
+### 支出管理 API
+
+#### 1. 获取支出列表
+- **端点**: `/api/expenses`
+- **方法**: `GET`
+- **请求头**: `Authorization: Bearer <token>`
+- **查询参数**:
+  - `startDate`: 开始日期 (格式: YYYY-MM-DD)
+  - `endDate`: 结束日期 (格式: YYYY-MM-DD)
+  - `reimburseType`: 报销类型
+  - `payType`: 支付类型
+  - `page`: 页码 (默认: 1)
+  - `limit`: 每页数量 (默认: 10)
+- **响应**:
+  ```json
+  {
+    "expenses": [
+      {
+        "_id": "支出 ID",
+        "amount": 100.0,
+        "reimburseType": "待报销",
+        "payType": "微信",
+        "date": "2024-01-01",
+        "other": "备注信息",
+        "reimburseAmount": 50.0
+      }
+    ],
+    "total": 1
+  }
+  ```
+
+#### 2. 添加支出
+- **端点**: `/api/expenses`
+- **方法**: `POST`
+- **请求头**: `Authorization: Bearer <token>`
+- **请求体**:
+  ```json
+  {
+    "_id": "", // 新增时为空，由服务器生成
+    "amount": 100.0,
+    "reimburseType": "待报销",
+    "payType": "微信",
+    "date": "2024-01-01",
+    "other": "备注信息",
+    "reimburseAmount": 50.0
+  }
+  ```
+- **响应**:
+  ```json
+  {
+    "_id": "生成的支出 ID",
+    "amount": 100.0,
+    "reimburseType": "待报销",
+    "payType": "微信",
+    "date": "2024-01-01",
+    "other": "备注信息",
+    "reimburseAmount": 50.0
+  }
+  ```
+
+#### 3. 更新支出
+- **端点**: `/api/expenses/{id}`
+- **方法**: `PUT`
+- **请求头**: `Authorization: Bearer <token>`
+- **请求体**:
+  ```json
+  {
+    "_id": "支出 ID",
+    "amount": 150.0,
+    "reimburseType": "报销中",
+    "payType": "微信",
+    "date": "2024-01-01",
+    "other": "更新后的备注",
+    "reimburseAmount": 100.0
+  }
+  ```
+- **响应**:
+  ```json
+  {
+    "_id": "支出 ID",
+    "amount": 150.0,
+    "reimburseType": "报销中",
+    "payType": "微信",
+    "date": "2024-01-01",
+    "other": "更新后的备注",
+    "reimburseAmount": 100.0
+  }
+  ```
+
+#### 4. 删除支出
+- **端点**: `/api/expenses/{id}`
+- **方法**: `DELETE`
+- **请求头**: `Authorization: Bearer <token>`
+- **响应**: 无内容 (204 No Content)
+
+#### 5. 获取支出统计
+- **端点**: `/api/expenses/stats`
+- **方法**: `GET`
+- **请求头**: `Authorization: Bearer <token>`
+- **查询参数**:
+  - `startDate`: 开始日期 (格式: YYYY-MM-DD)
+  - `endDate`: 结束日期 (格式: YYYY-MM-DD)
+  - `reimburseType`: 报销类型
+  - `payType`: 支付类型
+- **响应**:
+  ```json
+  {
+    "totalExpense": 1000.0,
+    "pendingReimburse": 500.0,
+    "reimbursed": 300.0,
+    "balance": -200.0
+  }
+  ```
+
+### 客户端代码示例 (Kotlin/Android)
+
+#### 1. API 服务定义
+
+```kotlin
+interface ApiService {
+    @POST("/api/auth/login")
+    suspend fun login(@Body loginRequest: LoginRequest): LoginResponse
+
+    @POST("/api/auth/register")
+    suspend fun register(@Body registerRequest: RegisterRequest): RegisterResponse
+    
+    @POST("/api/auth/change-password")
+    suspend fun changePassword(
+        @Header("Authorization") token: String,
+        @Body changePasswordRequest: ChangePasswordRequest
+    ): ChangePasswordResponse
+    
+    @GET("/api/expenses/stats")
+    suspend fun getExpenseStats(
+        @Header("Authorization") token: String,
+        @QueryMap params: Map<String, String>
+    ): ExpenseStatsResponse
+    
+    @GET("/api/expenses")
+    suspend fun getExpenses(
+        @Header("Authorization") token: String,
+        @QueryMap params: Map<String, String>
+    ): ExpenseListResponse
+    
+    @GET("/api/config")
+    suspend fun getConfig(
+        @Header("Authorization") token: String
+    ): ConfigResponse
+    
+    @PUT("/api/config")
+    suspend fun updateConfig(
+        @Header("Authorization") token: String,
+        @Body configRequest: ConfigRequest
+    ): ConfigResponse
+    
+    @POST("/api/expenses")
+    suspend fun addExpense(
+        @Header("Authorization") token: String,
+        @Body expense: Expense
+    ): Expense
+    
+    @PUT("/api/expenses/{id}")
+    suspend fun updateExpense(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body expense: Expense
+    ): Expense
+    
+    @DELETE("/api/expenses/{id}")
+    suspend fun deleteExpense(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): Unit
+}
+
+// 请求和响应数据类
+data class LoginRequest(
+    val username: String,
+    val password: String
+)
+
+data class LoginResponse(
+    val token: String,
+    val userId: String,
+    val error: String? = null
+)
+
+data class ChangePasswordRequest(
+    val currentPassword: String,
+    val newPassword: String
+)
+
+data class ChangePasswordResponse(
+    val message: String,
+    val error: String? = null
+)
+
+data class ConfigRequest(
+    val type: String,
+    val options: List<String>
+)
+
+data class ConfigResponse(
+    val reimburseTypes: List<String>,
+    val payTypes: List<String>
+)
+```
+
+#### 2. 网络模块配置
+
+```kotlin
+object NetworkModule {
+    private const val BASE_URL = "https://your-api-base-url.com"
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        })
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    val apiService: ApiService = retrofit.create(ApiService::class.java)
+}
+```
+
+#### 3. 使用示例
+
+```kotlin
+// 修改密码
+fun changePassword(oldPassword: String, newPassword: String) {
+    viewModelScope.launch {
+        val token = _token.value
+        if (token == null) {
+            _error.value = "请先登录"
+            return@launch
+        }
+        val bearerToken = "Bearer $token"
+        try {
+            val response = NetworkModule.apiService.changePassword(
+                bearerToken,
+                ChangePasswordRequest(currentPassword = oldPassword, newPassword = newPassword)
+            )
+            if (response.error == null) {
+                _error.value = response.message
+            } else {
+                _error.value = "密码修改失败: ${response.error}"
+            }
+        } catch (e: HttpException) {
+            _error.value = "密码修改失败: HTTP错误 ${e.code()} - ${e.message()}"
+        } catch (e: Exception) {
+            _error.value = "密码修改失败: ${e.message}"
+        }
+    }
+}
+
+// 添加报销类型
+fun addReimburseType(typeName: String) {
+    viewModelScope.launch {
+        val token = authViewModel.token.value
+        if (token == null) {
+            _error.value = "添加报销类型失败: 未登录"
+            return@launch
+        }
+        val bearerToken = "Bearer $token"
+        try {
+            // 获取当前配置
+            val currentConfig = _config.value
+            // 创建新的报销类型列表
+            val newReimburseTypes = currentConfig.reimburseTypes.toMutableList()
+            newReimburseTypes.add(typeName)
+            // 更新配置
+            val response = NetworkModule.apiService.updateConfig(
+                bearerToken,
+                ConfigRequest("reimburseType", newReimburseTypes)
+            )
+            // 更新本地配置
+            _config.value = response
+        } catch (e: HttpException) {
+            _error.value = "添加报销类型失败: HTTP错误 ${e.code()} - ${e.message()}"
+        } catch (e: Exception) {
+            _error.value = "添加报销类型失败: ${e.message}"
+        }
+    }
+}
+```
+
+### 常见错误和解决方案
+
+#### 1. HTTP 401 Unauthorized
+- **原因**: 未提供认证令牌或令牌无效
+- **解决方案**:
+  - 确保在请求头中添加了 `Authorization: Bearer <token>`
+  - 确保令牌未过期
+  - 确保令牌格式正确
+
+#### 2. HTTP 400 Bad Request
+- **原因**: 请求参数错误或格式不正确
+- **解决方案**:
+  - 检查请求体格式是否正确
+  - 检查字段名称是否与API文档一致
+  - 确保所有必填字段都已提供
+
+#### 3. HTTP 405 Method Not Allowed
+- **原因**: 使用了错误的HTTP方法
+- **解决方案**:
+  - 检查API端点的HTTP方法是否正确
+  - 例如: 配置更新应该使用 `PUT` 方法，而不是 `POST` 方法
+
+#### 4. HTTP 500 Internal Server Error
+- **原因**: 服务器内部错误
+- **解决方案**:
+  - 检查服务器日志以获取详细错误信息
+  - 确保请求格式正确
+  - 联系服务器管理员
+
+### 最佳实践
+
+1. **认证令牌管理**:
+   - 安全存储JWT令牌
+   - 实现令牌过期处理
+   - 在令牌过期时自动重新登录
+
+2. **错误处理**:
+   - 对所有网络请求进行异常捕获
+   - 提供清晰的错误信息给用户
+   - 实现网络连接状态检测
+
+3. **请求优化**:
+   - 使用适当的HTTP方法
+   - 合理设置请求超时
+   - 实现请求缓存
+
+4. **安全性**:
+   - 不要在客户端存储敏感信息
+   - 实现HTTPS通信
+   - 对用户输入进行验证
+
 ---
 
 <div align="center">
