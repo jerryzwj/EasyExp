@@ -542,16 +542,16 @@ export default function HomePage() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2 text-xs sm:text-sm mb-1">
-                          <span className="text-gray-500">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
-                          <span className={`px-2 py-0.5 rounded-full font-medium ${
+                        <div className="flex items-center space-x-1 sm:space-x-2 text-[clamp(10px,2vw,14px)] mb-1 whitespace-nowrap">
+                          <span className="text-gray-500 flex-shrink-0">{new Date(expense.date).toLocaleDateString('zh-CN')}</span>
+                          <span className={`px-1 sm:px-2 py-0.5 rounded-full font-medium text-[clamp(9px,1.8vw,12px)] ${
                             expense.reimburseType === '已报销' ? 'bg-green-100 text-green-800' :
                             expense.reimburseType === '待报销' ? 'bg-yellow-100 text-yellow-800' :
                             'bg-blue-100 text-blue-800'
                           }`}>
                             {expense.reimburseType}
                           </span>
-                          <span className="text-gray-500">{expense.payType}</span>
+                          <span className="text-gray-500 flex-shrink-0">{expense.payType}</span>
                         </div>
                         <div className="mt-1">
                           {expense.other && (
